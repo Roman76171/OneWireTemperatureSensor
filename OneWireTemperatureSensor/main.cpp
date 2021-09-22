@@ -1,34 +1,42 @@
 ﻿#include <iostream>
-#include <fstream>
-#include <dirent.h>
+#include <string>
 #include "W1TempSensor.h"
 
-int main(void)
-{
-	InitLib();
-	W1TempSensor::setPullup(W1TempSensor::PullupSetting::DISABLE);
-	std::cout << std::string("r");
-	/*std::ifstream fin{"r1.txt"};
-	while (fin)
-	{
-		std::string str1{};
-		std::string str2{};
-		std::getline(fin, str1, '-');
-		std::getline(fin, str2);
-		std::cout << str1 << str2 << std::endl;
-	}
-	fin.close();*/
-	/*const std::string basePath{ "/sys/bus/w1/devices" };
+std::string deviceTypeToString(const W1TempSensor::DeviceType deviceType);
 
-	std::ifstream fin{ basePath + '/' + "w1_bus_master1" + '/' + "w1_master_slave_count"};
-	if (!fin.is_open())
+int main(void)
+{	
+	InitLib();
+	std::cout << "Count devices: " << W1TempSensor::getCountDevice() << ".\n";
+	std::cout << "List devices:\n";
+	auto deviceList{ W1TempSensor::getDevices() };
+	for (size_t index = 0; index < deviceList.size(); index++)
 	{
-		std::cerr << "Can't open file!" << std::endl;
+		std::cout << "  " << index + 1 << ". Device: " << deviceTypeToString(deviceList[index].familyCode) << ", serial number: " << deviceList[index].serialNumber << ". ";
+		W1TempSensor tempSensor{ deviceList[index] };
+		std::cout << "Temperature: " << tempSensor.getTemperature() << " degrees Celsius, resolution temperature conversion: " << tempSensor.getResolution() << " bit;\n";
 	}
-	std::string str{};
-	std::getline(fin, str);
-	fin.close();
-	std::cout << "File string: " << str << std::endl;*/
-	getchar();
+	std::cout << "\nThe program has finished executing. Press Enter to continue ..." << std::endl;
+	std::cin.get();
 	return 0;
+}
+
+std::string deviceTypeToString(const W1TempSensor::DeviceType deviceType)
+{
+	using deviceType_t = W1TempSensor::DeviceType;
+	switch (deviceType)
+	{
+	case deviceType_t::DS18S20:
+		return "DS18S20";
+	case deviceType_t::DS1822:
+		return "DS1822";
+	case deviceType_t::DS18B20:
+		return "DS18B20";
+	case deviceType_t::DS1825:
+		return "DS1825";
+	case deviceType_t::DS28EA00:
+		return "DS28EA00";
+	default:
+		return "Unknown device!";
+	}
 }

@@ -1,0 +1,5 @@
+#! /bin/bash
+
+cd ..
+cd ./OneWireTemperatureSensor/bin/ARM/Release
+./OneWireTemperatureSensor.out
